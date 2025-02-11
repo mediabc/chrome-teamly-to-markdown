@@ -34,22 +34,35 @@ function convertToMarkdown() {
         
       case Node.ELEMENT_NODE:
         switch (node.tagName.toLowerCase()) {
-          case 'h1': return `# ${node.textContent}\n\n`;
-          case 'h2': return `## ${node.textContent}\n\n`;
-          case 'h3': return `### ${node.textContent}\n\n`;
-          case 'p': return `${node.textContent}\n\n`;
+          case 'h1': 
+            return `# ${Array.from(node.childNodes).map(child => processNode(child)).join('')}\n\n`;
+          case 'h2': 
+            return `## ${Array.from(node.childNodes).map(child => processNode(child)).join('')}\n\n`;
+          case 'h3': 
+            return `### ${Array.from(node.childNodes).map(child => processNode(child)).join('')}\n\n`;
+          case 'p': 
+            return `${Array.from(node.childNodes).map(child => processNode(child)).join('')}\n\n`;
           case 'ul':
             return Array.from(node.children)
-              .map(li => `* ${li.textContent}\n`)
+              .map(li => `* ${Array.from(li.childNodes).map(child => processNode(child)).join('')}\n`)
               .join('') + '\n';
           case 'ol':
             return Array.from(node.children)
-              .map((li, i) => `${i + 1}. ${li.textContent}\n`)
+              .map((li, i) => `${i + 1}. ${Array.from(li.childNodes).map(child => processNode(child)).join('')}\n`)
               .join('') + '\n';
           case 'img':
             return `![${node.alt || ''}](${node.src})\n\n`;
           case 'a':
-            return `[${node.textContent}](${node.href})`;
+            // Improved link processing
+            const href = node.getAttribute('data-url') || node.href || '';
+            const text = Array.from(node.childNodes).map(child => processNode(child)).join('').trim() || '';
+            // Handle cases where href might be empty or same as text
+            if (!href || href === text) {
+              return text;
+            }
+            // Remove the base URL if it's an internal link
+            const cleanHref = href.replace(/^https?:\/\/[^\/]+/, '');
+            return `[${text}](${cleanHref})`;
           case 'code':
             return `\`${node.textContent}\``;
           case 'pre':
@@ -123,7 +136,6 @@ function processTable(tableNode) {
 
   // Функция для очистки и форматирования текста ячейки
   function processCellContent(cell) {
-    // Собираем весь текстовый контент, включая ссылки
     let content = '';
     
     function extractContent(node) {
@@ -134,16 +146,21 @@ function processTable(tableNode) {
       if (node.nodeType === Node.ELEMENT_NODE) {
         switch (node.tagName.toLowerCase()) {
           case 'a':
-            // Сохраняем ссылки в markdown формате
-            return `[${node.textContent.trim()}](${node.href})`;
+            const href = node.href || '';
+            const text = node.textContent.trim() || '';
+            // Handle cases where href might be empty or same as text
+            if (!href || href === text) {
+              return text;
+            }
+            // Remove the base URL if it's an internal link
+            const cleanHref = href.replace(/^https?:\/\/[^\/]+/, '');
+            return `[${text}](${cleanHref})`;
           case 'strong':
           case 'b':
             return `**${node.textContent.trim()}**`;
           case 'p':
-            // Объединяем параграфы пробелом вместо переноса строки
             return node.textContent.trim() + ' ';
           default:
-            // Рекурсивно обрабатываем вложенные элементы
             return Array.from(node.childNodes)
               .map(child => extractContent(child))
               .join('');
