@@ -7,7 +7,7 @@ function convertToMarkdown() {
   console.log('Full HTML:', document.documentElement.innerHTML);
 
   // Get the main article content - используем прямой селектор без parent matching
-  const article = document.querySelector('.tiptap.ProseMirror');
+  const article = document.querySelector('.editor-container .tiptap.ProseMirror');
   console.log('Article element:', article);
   if (!article) {
     console.error('Article element not found');
