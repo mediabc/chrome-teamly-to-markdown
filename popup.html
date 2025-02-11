@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Teamly Article Downloader</title>
   <style>
     body {
@@ -11,12 +12,41 @@
       width: 100%;
       padding: 8px;
       margin: 5px 0;
+      position: relative;
+      cursor: pointer;
+    }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #3498db;
+      border-radius: 50%;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: translateY(-50%) rotate(0deg); }
+      100% { transform: translateY(-50%) rotate(360deg); }
+    }
+    button.loading .spinner {
+      display: inline-block;
     }
   </style>
 </head>
 <body>
   <h3>Teamly Article Downloader</h3>
-  <button id="downloadBtn">Download Current Article</button>
+  <button id="downloadBtn">
+    Скачать статью
+    <div class="spinner"></div>
+  </button>
   <script src="popup.js"></script>
 </body>
 </html> 

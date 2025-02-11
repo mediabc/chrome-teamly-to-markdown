@@ -1,16 +1,22 @@
+// Функция для отправки состояния в popup
+function sendStatus(status) {
+  chrome.runtime.sendMessage({ type: 'STATUS', status });
+}
+
 function convertToMarkdown() {
   console.log('Starting conversion to Markdown...');
+  sendStatus('converting');
 
   // Log all available elements for debugging
   console.log('All editor elements:', document.querySelectorAll('[class*="editor"]'));
   console.log('All tiptap elements:', document.querySelectorAll('[class*="tiptap"]'));
-  console.log('Full HTML:', document.documentElement.innerHTML);
 
   // Get the main article content - используем прямой селектор без parent matching
   const article = document.querySelector('.editor-container .tiptap.ProseMirror');
   console.log('Article element:', article);
   if (!article) {
     console.error('Article element not found');
+    sendStatus('error');
     return null;
   }
 
@@ -114,13 +120,16 @@ function convertToMarkdown() {
     document.body.removeChild(a); // Удалим элемент
     URL.revokeObjectURL(url);
     console.log('Cleanup completed');
+    sendStatus('complete');
   } catch (error) {
     console.error('Error during download:', error);
+    sendStatus('error');
   }
 }
 
 // Увеличим задержку до 5 секунд, так как страница может загружаться дольше
 console.log('Script loaded, waiting for page...');
+sendStatus('waiting');
 setTimeout(() => {
   console.log('Attempting to convert after delay...');
   convertToMarkdown();
