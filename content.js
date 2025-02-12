@@ -12,7 +12,7 @@ function convertToMarkdown() {
   console.log('All tiptap elements:', document.querySelectorAll('[class*="tiptap"]'));
 
   // Get the main article content - используем прямой селектор без parent matching
-  const article = document.querySelector('.editor-container .tiptap.ProseMirror');
+  const article = document.querySelector('.editor__body-content .tiptap.ProseMirror');
   console.log('Article element:', article);
   if (!article) {
     console.error('Article element not found');
